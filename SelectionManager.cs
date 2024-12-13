@@ -53,11 +53,12 @@ namespace Jukumu
 
 
         public static T SelectOption<T>(
-            List<T> options,
+            IEnumerable<T> inputOptions,
             string title,
             Func<T, string> keySelector,
             Func<T, string> descriptionSelector)
         {
+            var options = inputOptions.ToList();
             // Prepare table content
             var tableData = options.Select((item, index) => new
             {

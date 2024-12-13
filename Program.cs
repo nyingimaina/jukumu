@@ -1,6 +1,8 @@
 ﻿using System.Reflection;
 using CommandDotNet;
 using Jukumu;
+using Jukumu.Commander;
+using Jukumu.Tasks;
 using Spectre.Console;
 
 namespace Jukumu
@@ -94,20 +96,27 @@ namespace Jukumu
                 return;
             }
 
-            var suggestedTasks = CommandTracker.GetSuggestions(nameof(Tasks), tasks.ToArray());
+            var suggestedTasks = CommandTracker.GetSuggestions(nameof(Tasks), tasks, a => a.Name);
+            var selectedTaskKey = SelectionManager.SelectOption(
+                suggestedTasks,
+                "Select the [green]task[/] to run:",
+                a => a,
+                a => tasks.Single(task => task.Name == a).Description
+            );
+            
 
-            var selectedTask = AnsiConsole.Prompt(
-                new SelectionPrompt<string>()
-                    .Title("Select the [green]task[/] to run:")
-                    .PageSize(4)
-                    .AddChoices(suggestedTasks));
+            CommandTracker.LogCommand(nameof(Tasks), selectedTaskKey);
+            DisplayFeedback($"Running [blue]{selectedTaskKey}[/]...");
 
-            CommandTracker.LogCommand(nameof(Tasks), selectedTask);
-            DisplayFeedback($"You selected task: [green]{selectedTask}[/]");
-            DisplayFeedback($"Running [blue]{selectedTask}[/]...");
+            var selectedTask = tasks.Single(a => a.Name == selectedTaskKey);
+            var selectedCommand = SelectionManager.SelectOption(
+                selectedTask.Commands,
+                "Select the [green]command[/] to run:",
+                keySelector: a => a.Name,
+                a => a.Description
+            );
 
-            // Simulate task execution
-            DisplayFeedback($"[bold green]Success![/] Task [blue]{selectedTask}[/] completed.");
+            CommandRunner.Run(selectedCommand);
         }
 
         [Command(Description = "Manage Working Directory")]

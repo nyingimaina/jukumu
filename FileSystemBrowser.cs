@@ -41,7 +41,7 @@ namespace Jukumu
                 var allChoices = directories.Concat(files).ToList();
 
                 var selection = SelectionManager.SelectOption(
-                    options: allChoices,
+                    allChoices,
                     title: $"Browsing: [blue]{currentDirectory}[/]\nSelect a directory or file:",
                     a => a!.ToString(),
                     a => string.Empty

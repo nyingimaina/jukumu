@@ -17,9 +17,13 @@ namespace Jukumu
     }
 
     // Get sorted options based on usage
-    public static string[] GetSuggestions(string commandName, IEnumerable<string> defaultOptions)
+    public static string[] GetSuggestions<T>(string commandName, IEnumerable<T> defaultOptions, Func<T,string> nameRetriever = null!)
     {
-        var asArray = defaultOptions.ToArray();
+        if(nameRetriever == null)
+        {
+            nameRetriever = (a) => a?.ToString()! ?? string.Empty;
+        }
+            var asArray = defaultOptions.Select(a => nameRetriever(a)).ToArray();
         if (CommandUsageData.TryGetValue(commandName, out var usage))
         {
             return usage.GetSortedOptions(asArray);
