@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using CommandDotNet;
+using jukumu.InputOutput;
 using Spectre.Console;
 
 namespace Jukumu
@@ -61,7 +62,7 @@ namespace Jukumu
                 try
                 {
                     AnsiConsole.MarkupLine($"[yellow]Executing command:[/] [cyan]{commandName}[/]");
-                    methodInfo.Invoke(commandOwner,null);
+                    methodInfo.Invoke(commandOwner, null);
                 }
                 catch (Exception ex)
                 {

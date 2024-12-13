@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using CommandDotNet;
+using jukumu.InputOutput;
 using Jukumu;
 using Jukumu.Commander;
 using Jukumu.Tasks;
@@ -48,12 +49,12 @@ namespace Jukumu
             }
         }
 
-       
 
-       
 
-        
-       // Define the "generate" command
+
+
+
+        // Define the "generate" command
         [Command(Description = "Generate boilerplate code")]
         public void Generate(
             [Option(Description = "Output directory (default is './generated')")] string output = "./generated")
@@ -96,27 +97,27 @@ namespace Jukumu
                 return;
             }
 
-            var suggestedTasks = CommandTracker.GetSuggestions(nameof(Tasks), tasks, a => a.Name);
+            var suggestedTasks = CommandTracker.GetSuggestions(nameof(Tasks), tasks, a => a.Key);
             var selectedTaskKey = SelectionManager.SelectOption(
                 suggestedTasks,
                 "Select the [green]task[/] to run:",
                 a => a,
-                a => tasks.Single(task => task.Name == a).Description
+                a => tasks.Single(task => task.Key == a).Description
             );
-            
+
 
             CommandTracker.LogCommand(nameof(Tasks), selectedTaskKey);
             DisplayFeedback($"Running [blue]{selectedTaskKey}[/]...");
 
-            var selectedTask = tasks.Single(a => a.Name == selectedTaskKey);
+            var selectedTask = tasks.Single(a => a.Key == selectedTaskKey);
             var selectedCommand = SelectionManager.SelectOption(
-                selectedTask.Commands,
+                selectedTask.Actions,
                 "Select the [green]command[/] to run:",
-                keySelector: a => a.Name,
+                keySelector: a => a.Key,
                 a => a.Description
             );
 
-            CommandRunner.Run(selectedCommand);
+            CommandRunner.Run(selectedTask.App, selectedCommand);
         }
 
         [Command(Description = "Manage Working Directory")]

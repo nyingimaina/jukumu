@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Spectre.Console;
 
-namespace Jukumu
+namespace jukumu.InputOutput
 {
     public static class SelectionManager
     {
@@ -32,7 +32,7 @@ namespace Jukumu
                     Console.WriteLine($"{question} (y/n): ");
                     var input = Console.Read();
                     var inputChar = (char)input;
-                    if(map.TryGetValue(inputChar, out bool value))
+                    if (map.TryGetValue(inputChar, out bool value))
                     {
                         return value;
                     }
@@ -129,7 +129,7 @@ namespace Jukumu
                 return options[selectedIndex];
             }
 
-            
+
         }
 
 
@@ -140,11 +140,11 @@ namespace Jukumu
 
             // Regular expression to match AnsiConsole markup, which is enclosed in square brackets
             var markupPattern = @"\[.*?\]";
-            
+
             // Replace the markup tags with an empty string
             return System.Text.RegularExpressions.Regex.Replace(value, markupPattern, string.Empty);
         }
-        
+
 
     }
 }

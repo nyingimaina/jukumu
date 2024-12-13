@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using jukumu.Conversations;
 
 namespace Jukumu.Tasks
 {
     public class TaskDescription : CommandDescription
     {
-        
-        public HashSet<ExecutableCommand> Commands { get; set; } = new HashSet<ExecutableCommand>();
+
+        public HashSet<TaskAction> Actions { get; set; } = new HashSet<TaskAction>();
 
     }
 }

@@ -1,4 +1,7 @@
+using System.Text.Json;
 using System.Text.Json.Serialization;
+using jukumu.Conversations;
+using jukumu.InputOutput;
 
 namespace Jukumu.Tasks
 {
@@ -6,7 +9,7 @@ namespace Jukumu.Tasks
     {
         public string TasksDirectory
         {
-            get => Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Jukumu");
+            get => Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Statics.AppName);
         }
 
 
@@ -16,7 +19,8 @@ namespace Jukumu.Tasks
             {
                 Func<string, string> getManifestFilename = (string directoryName) =>
                 {
-                    return Path.Combine(directoryName, "jukumu.json");
+                    var finalPath = Path.Combine(directoryName, Statics.AppName, "manifest.json");
+                    return finalPath;
                 };
 
                 EnsureTasksDirectoryExists();
@@ -27,9 +31,14 @@ namespace Jukumu.Tasks
                     try
                     {
                         var manifestContent = File.ReadAllText(getManifestFilename(a));
-                        return System.Text.Json.JsonSerializer.Deserialize<TaskDescription>(
+                        var taskDescription = System.Text.Json.JsonSerializer.Deserialize<TaskDescription>(
                             manifestContent
                         );
+                        if (taskDescription != null)
+                        {
+                            PopulateActions(taskDescription, a);
+                        }
+                        return taskDescription;
                     }
                     catch (Exception e)
                     {
@@ -52,10 +61,36 @@ namespace Jukumu.Tasks
             }
         }
 
+        private void PopulateActions(TaskDescription taskDescription, string directoryName)
+        {
+            var actionsDirectory = Path.Combine(directoryName, Statics.AppName, "Actions");
+            if (Directory.Exists(actionsDirectory) == false)
+            {
+                return;
+            }
+            var actionFiles = Directory.GetFiles(actionsDirectory, "*.json");
+            foreach (var specificActionFile in actionFiles)
+            {
+                try
+                {
+                    var fileContent = File.ReadAllText(specificActionFile);
+                    var taskAction = JsonSerializer.Deserialize<TaskAction>(fileContent);
+                    if (taskAction != null)
+                    {
+                        taskDescription.Actions.Add(taskAction);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Writer.WriteError($"Error loading action file '{specificActionFile}'\n{e.Message}");
+                }
+
+            }
+        }
 
         private void EnsureTasksDirectoryExists()
         {
-            if(!Directory.Exists(TasksDirectory))
+            if (!Directory.Exists(TasksDirectory))
             {
                 Directory.CreateDirectory(TasksDirectory);
             }
