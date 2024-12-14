@@ -54,35 +54,6 @@ namespace Jukumu
 
 
 
-        // Define the "generate" command
-        [Command(Description = "Generate boilerplate code")]
-        public void Generate(
-            [Option(Description = "Output directory (default is './generated')")] string output = "./generated")
-        {
-            // Default templates
-            var defaultTemplates = new[] { "Model", "Controller", "Service", "ViewModel" };
-
-            // Get intelligent suggestions from CommandTracker
-            var suggestedTemplates = CommandTracker.GetSuggestions("generate", defaultTemplates);
-
-            // Use Spectre.Console to show a selection prompt
-            var selectedTemplate = AnsiConsole.Prompt(
-                new SelectionPrompt<string>()
-                    .Title("Select the [green]template[/] to generate:")
-                    .PageSize(4)
-                    .AddChoices(suggestedTemplates));
-
-            // Log the selected template
-            CommandTracker.LogCommand("generate", selectedTemplate);
-
-            // Show feedback
-            DisplayFeedback($"You selected: [green]{selectedTemplate}[/]");
-            DisplayFeedback($"Generating [blue]{selectedTemplate}[/] in [cyan]{output}[/]...");
-
-            // Simulate file generation
-            DisplayFeedback($"[bold green]Success![/] {selectedTemplate} has been generated at [cyan]{output}[/].");
-        }
-
         [Command(Description = "Show all tasks available")]
         public void Tasks()
         {
