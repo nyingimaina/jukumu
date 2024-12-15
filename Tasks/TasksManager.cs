@@ -1,6 +1,7 @@
 using System.Text.Json;
 using jukumu.Conversations;
 using jukumu.InputOutput;
+using jukumu.Tasks;
 
 namespace Jukumu.Tasks
 {

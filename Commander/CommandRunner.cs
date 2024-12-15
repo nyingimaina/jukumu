@@ -14,11 +14,10 @@ namespace Jukumu.Commander
             Console.WriteLine($"Running {taskAction.Key}");
             var executionResults = new Dictionary<string, string>();
             Talker.Talk(taskAction.Conversation);
-            new ProcessRunner(executionResults)
-                .Run(executable: globalExecutable, taskAction: taskAction);
+            ExecuteAction(taskAction);
         }
 
-        private static void ExecutePlan(TaskAction taskAction)
+        private static void ExecuteAction(TaskAction taskAction)
         {
             var executionResults = new Dictionary<string, string>();
             const string divider = "------------------------------------------------------------";
@@ -28,26 +27,26 @@ namespace Jukumu.Commander
                 specificExchange.Answer = Context.GetWithVariablesReplaced(specificExchange.Answer, taskAction.Conversation);
             }
             
-            foreach (var action in taskAction.)
+            foreach (var command in taskAction.Commands)
             {
-                action.Key = Context.GetWithVariablesReplaced(action.Key, taskAction.Conversation);
+                command.Key = Context.GetWithVariablesReplaced(command.Key, taskAction.Conversation);
 
-                Writer.WriteInfo($"{divider}\n\t{++counter}. Attempting Command: {action.Key}\n{divider}\n");
+                Writer.WriteInfo($"{divider}\n\t{++counter}. Attempting Command: {command.Key}\n{divider}\n");
 
 
                 using (var processRunner = new ProcessRunner(executionResults))
                 {
-                    processRunner.SetArgumentQuotingPreference(plan.QuoteSpacedArguments);
-                    foreach (var arg in action.Args)
+                    processRunner.SetArgumentQuotingPreference(true);
+                    foreach (var arg in command.Arguments)
                     {
-                        var trueArg = Context.GetWithVariablesReplaced(arg, plan.Conversation);
+                        var trueArg = Context.GetWithVariablesReplaced(arg, taskAction.Conversation);
                         processRunner.AddArgument(trueArg);
                     }
                     processRunner.DoNotUseShellExecute();
-                    processRunner.SetOutputFuncs(LogWrapper.Debug, LogWrapper.Error);
-                    processRunner.Run(action, plan.Conversation);
+                    processRunner.SetOutputFuncs(Writer.WriteInfo, Writer.WriteError);
+                    processRunner.Run(command);
                 }
-                LogWrapper.Debug($"\n{divider}\nSucceeded: {action.Name}\n{divider}\n\n\n");
+                Writer.WriteInfo($"\n{divider}\nSucceeded: {command.Key}\n{divider}\n\n\n");
             }
         }
     }

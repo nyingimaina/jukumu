@@ -9,7 +9,7 @@ namespace Jukumu
     {
         private const string Exit = "Exit";
         // Method to fetch commands and include an Exit command, excluding the 'Navigator' command
-        private static object commandOwner;
+        private static object commandOwner = new object();
         public static dynamic? Command(object commandOwner)
         {
             NavigationManager.commandOwner = commandOwner;

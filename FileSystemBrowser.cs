@@ -45,7 +45,7 @@ namespace Jukumu
                     title: $"Browsing: [blue]{currentDirectory}[/]\nSelect a directory or file:",
                     a => a!.ToString(),
                     a => string.Empty
-                );
+                )!;
 
 
 

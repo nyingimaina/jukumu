@@ -68,16 +68,16 @@ namespace Jukumu.Commander
             };
         }
 
-        public void Run(string executable, TaskAction taskAction)
+        public void Run(TaskCommand taskCommand)
         {
 
-
-            _successExitCode = taskAction.SuccessExitCode;
+            var executable = taskCommand.Command;
+            _successExitCode = taskCommand.SuccessExitCode;
             MakeFuncsSafe();
             _args = _args.Trim();
             Writer.WriteInfo($"Running executable: {executable}");
             Writer.WriteInfo($"Args: {_args}");
-            RunExternalProcess(executable: executable, taskAction);
+            RunExternalProcess(executable: executable, taskCommand);
         }
 
 
@@ -85,7 +85,7 @@ namespace Jukumu.Commander
 
 
 
-        private void RunExternalProcess(string executable, TaskAction taskAction)
+        private void RunExternalProcess(string executable, TaskCommand taskCommand)
         {
             using (var process = new Process
             {
@@ -98,12 +98,12 @@ namespace Jukumu.Commander
                 }
             })
             {
-                SubscribeToEventsIfUsingShellExecute(process, taskAction.Key);
+                SubscribeToEventsIfUsingShellExecute(process, taskCommand.Key);
                 RedirectToStandardOutputsIfNotUsingShellExecute(process);
                 process.Start();
                 process.WaitForExit();
-                ReadOutputsIfNotUsingShellExecute(process, taskAction.Key);
-                WriteLinesIfAnyCached(taskAction.Key, process.ExitCode);
+                ReadOutputsIfNotUsingShellExecute(process, taskCommand.Key);
+                WriteLinesIfAnyCached(taskCommand.Key, process.ExitCode);
             }
         }
 
@@ -164,7 +164,10 @@ namespace Jukumu.Commander
             while (StreamHasContent(stream))
             {
                 var line = stream.ReadLine();
-                fnOut(commandName, line);
+                if (!string.IsNullOrEmpty(line))
+                {
+                    fnOut(commandName, line);
+                }
             }
         }
 
@@ -188,13 +191,13 @@ namespace Jukumu.Commander
                 process.EnableRaisingEvents = _useShellExecute;
                 if (_successExitCode == null)
                 {
-                    process.OutputDataReceived += (s, e) => _fnOutput(commandName, e.Data);
-                    process.ErrorDataReceived += (s, e) => _fnError(commandName, e.Data);
+                    process.OutputDataReceived += (s, e) => _fnOutput(commandName, e.Data ?? string.Empty);
+                    process.ErrorDataReceived += (s, e) => _fnError(commandName, e.Data ?? string.Empty);
                 }
                 else
                 {
-                    process.OutputDataReceived += (s, e) => CacheLine(commandName, e.Data);
-                    process.ErrorDataReceived += (s, e) => CacheLine(commandName, e.Data);
+                    process.OutputDataReceived += (s, e) => CacheLine(commandName, e.Data ?? string.Empty);
+                    process.ErrorDataReceived += (s, e) => CacheLine(commandName, e.Data ?? string.Empty);
                 }
             }
         }
@@ -224,7 +227,11 @@ namespace Jukumu.Commander
             Dictionary<string, string> executionResults)
         {
             this.executionResults = executionResults;
+            _fnError = (_,__) => { };
+            _fnOutput = _fnError;
         }
+
+
 
         protected virtual void Dispose(bool disposing)
         {
@@ -233,8 +240,8 @@ namespace Jukumu.Commander
                 if (disposing)
                 {
                     _args = string.Empty;
-                    _fnOutput = null;
-                    _fnError = null;
+                    _fnError = (_,__) => { };
+                    _fnOutput = _fnError;
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
