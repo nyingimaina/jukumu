@@ -1,8 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Jukumu.Conversations;
+using System.Collections.ObjectModel;
+using jukumu.Conversations;
 
 namespace jukumu.Conversations
 {
@@ -11,7 +8,8 @@ namespace jukumu.Conversations
         public Conversation Conversation { get; set; } = new Conversation();
         public string Key { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public int SuccessExitCode { get; set; } = 0;
+
+        public List<TaskCommand> Commands { get; set; } = new List<TaskCommand>();
 
         public override bool Equals(object? obj)
         {

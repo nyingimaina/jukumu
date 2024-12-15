@@ -1,12 +1,6 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using jukumu.Conversations;
-using Jukumu.Conversations;
 using jukumu.InputOutput;
 
 namespace Jukumu.Commander
@@ -23,13 +17,17 @@ namespace Jukumu.Commander
 
         private List<string> _cachedOutputLines = new List<string>();
 
-        private bool _quoteSpacedArguments = false;
+        private bool _quoteSpacedArguments;
 
 
 
         public void AddArgument(string argument)
         {
-            var hasSpaces = argument.IndexOf(' ') >= 0;
+            if (string.IsNullOrEmpty(argument))
+            {
+                throw new ArgumentNullException(nameof(argument));
+            }
+            var hasSpaces = argument.IndexOf(' ', StringComparison.InvariantCulture) >= 0;
             if (_quoteSpacedArguments && hasSpaces)
             {
                 argument = $"\"{argument}\"";
@@ -72,7 +70,7 @@ namespace Jukumu.Commander
 
         public void Run(string executable, TaskAction taskAction)
         {
-            var conversation = taskAction.Conversation;
+
 
             _successExitCode = taskAction.SuccessExitCode;
             MakeFuncsSafe();

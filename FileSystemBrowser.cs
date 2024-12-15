@@ -1,5 +1,4 @@
 using jukumu.InputOutput;
-using Jukumu;
 using Spectre.Console;
 
 namespace Jukumu

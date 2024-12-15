@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using jukumu.Conversations;
 
-namespace Jukumu.Tasks
+namespace jukumu.Tasks
 {
     public class TaskDescription : CommandDescription
     {

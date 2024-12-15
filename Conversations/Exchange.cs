@@ -1,4 +1,4 @@
-namespace Jukumu.Conversations
+namespace jukumu.Conversations
 {
     public class Exchange
     {

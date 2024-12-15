@@ -2,7 +2,7 @@
 
 using jukumu.InputOutput;
 
-namespace Jukumu.Conversations
+namespace jukumu.Conversations
 {
     public static class Talker
     {

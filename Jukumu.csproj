@@ -5,6 +5,22 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <RootNamespace>jukumu</RootNamespace>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors>nullable</WarningsAsErrors>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <Deterministic>true</Deterministic>
+    <Optimize>true</Optimize>
+    <TrimUnusedDependencies>true</TrimUnusedDependencies>
+    <DebugType>embedded</DebugType>
+    <LangVersion>latest</LangVersion>
+    <PublishTrimmed>true</PublishTrimmed> <!-- Trim during publish -->
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <RuntimeIdentifiers>
+      win-x64;win-arm64;linux-x64;linux-arm64;osx-x64;osx-arm64
+    </RuntimeIdentifiers>
   </PropertyGroup>
 
   <ItemGroup>

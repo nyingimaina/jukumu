@@ -1,16 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using jukumu.AppContext;
 using jukumu.Conversations;
-using Jukumu.Conversations;
-using Jukumu.Tasks;
+using jukumu.InputOutput;
+using jukumu.Tasks;
 
 namespace Jukumu.Commander
 {
     public static class CommandRunner
     {
-        public static void Run(string globalExecutable, TaskAction taskAction)
+        public static void Run(
+            string globalExecutable,
+            TaskAction taskAction)
         {
             Console.WriteLine($"Running {taskAction.Key}");
             var executionResults = new Dictionary<string, string>();
@@ -19,38 +18,36 @@ namespace Jukumu.Commander
                 .Run(executable: globalExecutable, taskAction: taskAction);
         }
 
-        private static void ExecutePlan(Conversation conversation)
+        private static void ExecutePlan(TaskAction taskAction)
         {
             var executionResults = new Dictionary<string, string>();
             const string divider = "------------------------------------------------------------";
             var counter = 0;
-            foreach (var specificExchange in conversation.Exchange)
+            foreach (var specificExchange in taskAction.Conversation.Exchange)
             {
-                specificExchange.Answer = Context.GetWithVariablesReplaced(specificExchange.Answer, plan.Conversation);
+                specificExchange.Answer = Context.GetWithVariablesReplaced(specificExchange.Answer, taskAction.Conversation);
             }
-            foreach (var command in plan.Commands)
+            
+            foreach (var action in taskAction.)
             {
-                using (new Profiler(command.Name))
+                action.Key = Context.GetWithVariablesReplaced(action.Key, taskAction.Conversation);
+
+                Writer.WriteInfo($"{divider}\n\t{++counter}. Attempting Command: {action.Key}\n{divider}\n");
+
+
+                using (var processRunner = new ProcessRunner(executionResults))
                 {
-                    command.Name = Context.GetWithVariablesReplaced(command.Name, plan.Conversation);
-
-                    LogWrapper.Debug($"{divider}\n\t{++counter}. Attempting Command: {command.Name}\n{divider}\n");
-
-
-                    using (var processRunner = new ProcessRunner(executionResults))
+                    processRunner.SetArgumentQuotingPreference(plan.QuoteSpacedArguments);
+                    foreach (var arg in action.Args)
                     {
-                        processRunner.SetArgumentQuotingPreference(plan.QuoteSpacedArguments);
-                        foreach (var arg in command.Args)
-                        {
-                            var trueArg = Context.GetWithVariablesReplaced(arg, plan.Conversation);
-                            processRunner.AddArgument(trueArg);
-                        }
-                        processRunner.DoNotUseShellExecute();
-                        processRunner.SetOutputFuncs(LogWrapper.Debug, LogWrapper.Error);
-                        processRunner.Run(command, plan.Conversation);
+                        var trueArg = Context.GetWithVariablesReplaced(arg, plan.Conversation);
+                        processRunner.AddArgument(trueArg);
                     }
-                    LogWrapper.Debug($"\n{divider}\nSucceeded: {command.Name}\n{divider}\n\n\n");
+                    processRunner.DoNotUseShellExecute();
+                    processRunner.SetOutputFuncs(LogWrapper.Debug, LogWrapper.Error);
+                    processRunner.Run(action, plan.Conversation);
                 }
+                LogWrapper.Debug($"\n{divider}\nSucceeded: {action.Name}\n{divider}\n\n\n");
             }
         }
     }

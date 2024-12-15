@@ -1,10 +1,13 @@
-namespace Jukumu.Tasks
+using System.Collections.ObjectModel;
+
+namespace jukumu.Tasks
 {
     public class CommandDescription
     {
         public string Key { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public string App { get; set; } = string.Empty;
+
 
         public override bool Equals(object? obj)
         {

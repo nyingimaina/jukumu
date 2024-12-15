@@ -1,7 +1,5 @@
-﻿using System.Reflection;
-using CommandDotNet;
+﻿using CommandDotNet;
 using jukumu.InputOutput;
-using Jukumu;
 using Jukumu.Commander;
 using Jukumu.Tasks;
 using Spectre.Console;
